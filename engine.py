@@ -5,6 +5,8 @@ from fov_functions import initialize_fov,recompute_fov
 from entity import Entity,get_blocking_entities_at_location
 from game_states import GameStates
 from input_handlers import handle_keys
+from components.fighter import Fighter
+from components.ai import BasicMonster
 from map_objects.game_map import GameMap
 from render_functions import clear_all, render_all
 def main():
@@ -34,7 +36,8 @@ def main():
     player_y = int(screen_height / 2)
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    player = Entity(0, 0, '@', libtcod.white, "Player", blocks=True)
+    fighter_component = Fighter(hp=30, defense=2, power=5)
+    player = Entity(0, 0, '@', libtcod.white, "Player", blocks=True, fighter=fighter_component)
     npc = Entity(player_x -5, player_y, '@', libtcod.yellow, "NPC", blocks=True)
     entities = [player]
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False, libtcod.RENDERER_SDL2, 'C', True)
@@ -85,8 +88,8 @@ def main():
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
-                if entity != player:
-                     print('The ' + entity.name + ' ponders the meaning of its existence.')
+                if entity.ai:
+                     entity.ai.take_turn(player, fov_map, game_map, entities)
             game_state = GameStates.PLAYERS_TURN
 
 if __name__ == '__main__':
