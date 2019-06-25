@@ -75,7 +75,9 @@ def main():
             if not game_map.is_blocked(destination_x, destination_y):
                 target = get_blocking_entities_at_location(entities, destination_x, destination_y)
                 if target:
-                    print('You kick the ' + target.name + ' in the shins, much to its annoyance!')
+                    player.fighter.attack(target)
+                elif target.figher.hp > 0:
+                    monster.fighter.attack(target)
                 else:
                     player.move(dx, dy)
                     fov_recompute = True
