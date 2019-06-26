@@ -1,10 +1,12 @@
 import tcod as libtcod
 import math
+
+from render_functions import RenderOrder
 class Entity:
     """
     A Generic object to rep stuff
     """
-    def __init__(self, x, y, char, color, name, blocks = False, fighter=None, ai=None):
+    def __init__(self, x, y, char, color, name, blocks = False, render_order=RenderOrder.CORPSE, fighter=None, ai=None):
         self.x = x
         self.y = y
         self.char = char
@@ -12,6 +14,7 @@ class Entity:
         self.name = name
         self.blocks = blocks
         self.fighter = fighter
+        self.render_order = render_order
         self.ai = ai
 
         if self.fighter:
@@ -23,7 +26,7 @@ class Entity:
         self.x += dx
         self.y += dy
 
-    def move_toward(self, target_x, target_y, game_map, entities):
+    def move_towards(self, target_x, target_y, game_map, entities):
         dx = target_x - self.x
         dy = target_y - self.y
         distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -31,8 +34,8 @@ class Entity:
         dx = int(round(dx / distance))
         dy = int(round(dy / distance))
 
-        if not (game_map.is_blocked(self.x + dx, self.y + dy)) or
-                get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)
+        if not (game_map.is_blocked(self.x + dx, self.y + dy) or
+                get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
                 self.move(dx, dy)
 
     def move_astar(self, target, entities, game_map):

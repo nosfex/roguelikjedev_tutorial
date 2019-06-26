@@ -6,7 +6,7 @@ class Fighter:
         self.power = power
 
     def take_damage(self, amount):
-        result []
+        results = []
         self.hp -= amount
 
         if self.hp <= 0:
@@ -14,7 +14,7 @@ class Fighter:
         return results
 
     def attack(self, target):
-        results []
+        results = []
         damage = self.power - target.fighter.defense
 
         if damage > 0:
