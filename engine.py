@@ -14,8 +14,16 @@ def main():
     screen_width = 80
     screen_height = 50
 
+    bar_width = 20
+    panel_height = 7
+    panel_y = screen_height - panel_height
+
+    message_x = bar_width + 2
+    message_width = screen_width - bar_width - 2
+    message_height = panel_height - 1
+
     map_width = 80
-    map_height = 45
+    map_height = 43
 
     room_max_size = 10
     room_min_size = 6
@@ -43,6 +51,7 @@ def main():
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False, libtcod.RENDERER_SDL2, 'C', True)
     con = libtcod.console.Console(screen_width, screen_height)
 
+    panel = libtcod.console.Console(screen_width, panel_height)
     game_map = GameMap(map_width, map_height)
     game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room)
 
@@ -59,7 +68,7 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors)
         fov_recompute = False
         libtcod.console_flush()
         clear_all(con, entities)
@@ -78,7 +87,7 @@ def main():
                 if target:
                     attack_results = player.fighter.attack(target)
                     player_turn_results.extend(attack_results)
-            
+
                 else:
                     player.move(dx, dy)
                     fov_recompute = True
