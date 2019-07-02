@@ -8,6 +8,7 @@ from input_handlers import handle_keys
 from components.fighter import Fighter
 from components.ai import BasicMonster
 from map_objects.game_map import GameMap
+from game_message import MessageLog
 from death_functions import kill_monster, kill_player
 from render_functions import clear_all, render_all, RenderOrder
 def main():
@@ -58,6 +59,8 @@ def main():
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
+    message_log = MessageLog(message_x, message_width, message_height)
+
     key = libtcod.Key()
     mouse = libtcod.Mouse()
     event = ''
@@ -103,14 +106,14 @@ def main():
             dead_entity = player_turn_result.get('dead')
 
             if message:
-                print(message)
+                message_log.add_message(message)
             if dead_entity:
                 if dead_entity == player:
                     message, game_state = kill_player(dead_entity)
                 else:
                     message = kill_monster(dead_entity)
 
-                print(message)
+                message_log.add_message(message);
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
@@ -121,7 +124,7 @@ def main():
                         message = enemy_turn_result.get('message')
                         dead_entity = enemy_turn_result.get('dead')
                         if message:
-                            print(message)
+                            message_log.add_message(message)
                         if dead_entity:
                             if dead_entity == player:
                                 message, game_state = kill_player(dead_entity)
