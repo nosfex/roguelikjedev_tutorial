@@ -8,7 +8,7 @@ from input_handlers import handle_keys
 from components.fighter import Fighter
 from components.ai import BasicMonster
 from map_objects.game_map import GameMap
-from game_message import MessageLog
+from game_messages import MessageLog
 from death_functions import kill_monster, kill_player
 from render_functions import clear_all, render_all, RenderOrder
 def main():
@@ -66,12 +66,12 @@ def main():
     event = ''
 
     while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors)
+        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors)
         fov_recompute = False
         libtcod.console_flush()
         clear_all(con, entities)
