@@ -11,6 +11,8 @@ from map_objects.game_map import GameMap
 from game_messages import MessageLog
 from death_functions import kill_monster, kill_player
 from render_functions import clear_all, render_all, RenderOrder
+from components.inventory import Inventory
+
 def main():
     screen_width = 80
     screen_height = 50
@@ -48,6 +50,7 @@ def main():
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
     fighter_component = Fighter(hp=30, defense=2, power=5)
+    inventory_component = Inventory(26)
     player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component)
     entities = [player]
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False, libtcod.RENDERER_SDL2, 'C', True)
