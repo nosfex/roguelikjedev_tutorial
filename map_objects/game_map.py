@@ -3,9 +3,11 @@ from random import randint
 from entity import Entity
 from map_objects.tile import Tile
 from components.ai import BasicMonster
+from components.item import Item
 from components.fighter import Fighter
 from map_objects.rectangle import Rect
 from render_functions import RenderOrder
+from item_functions import heal
 class GameMap:
     def __init__(self, width, height):
         self.width = width
@@ -91,7 +93,8 @@ class GameMap:
             y = randint (room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                item = Entity(x,y, '!', libtcod.violet, 'Healing Potion', render_order = RenderOrder.ITEM )
+                item_component = Item(use_function=heal, amount=4)
+                item = Entity(x,y, '!', libtcod.violet, 'Healing Potion', render_order = RenderOrder.ITEM, item=item_component)
                 entities.append(item)
     def is_blocked(self, x, y):
         if self.tiles[x][y].blocked:

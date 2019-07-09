@@ -1,11 +1,14 @@
 import tcod as libtcod
+from game_states import GameStates
+from menus import inventory_menu
 from enum import Enum
 
 class RenderOrder(Enum):
     CORPSE = 1
     ITEM = 2
     ACTOR = 3
-def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors):
+def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height,
+                bar_width, panel_height, panel_y, mouse, colors, game_state):
 
     if fov_recompute:
         #draw map
@@ -47,6 +50,14 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, get_names_under_mouse(mouse, entities, fov_map))
 
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
+
+    if game_state in(GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
+        if game_state == GameStates.SHOW_INVENTORY:
+            inventory_title = 'Press the key next to an item to use it, or esc to cancel.\n'
+        else:
+            inventory_title = 'Press the key next to an item to drop it, or esc to cancel.\n'
+
+        inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
     bar_width = int(float(value) / maximum * total_width)
