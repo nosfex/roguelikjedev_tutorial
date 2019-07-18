@@ -7,7 +7,7 @@ from components.item import Item
 from components.fighter import Fighter
 from map_objects.rectangle import Rect
 from render_functions import RenderOrder
-from item_functions import heal
+from item_functions import heal, cast_lighting
 class GameMap:
     def __init__(self, width, height):
         self.width = width
@@ -93,8 +93,14 @@ class GameMap:
             y = randint (room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                item_component = Item(use_function=heal, amount=4)
-                item = Entity(x,y, '!', libtcod.violet, 'Healing Potion', render_order = RenderOrder.ITEM, item=item_component)
+                item_chance = randint(0, 100)
+                item = 0
+                if item_chance < 70:
+                    item_component = Item(use_function=heal, amount=4)
+                    item = Entity(x,y, '!', libtcod.violet, 'Healing Potion', render_order = RenderOrder.ITEM, item=item_component)
+                else:
+                    item_component = Item(use_function=cast_lighting, damage=20,  maximum_range=5)
+                    item = Entity(x, y, '#', libtcod.yellow, 'Lightning Scroll', render_order= RenderOrder.ITEM, item=item_component)
                 entities.append(item)
     def is_blocked(self, x, y):
         if self.tiles[x][y].blocked:
