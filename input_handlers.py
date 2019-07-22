@@ -9,6 +9,8 @@ def handle_keys(key, game_state) :
         return handle_player_dead_keys(key)
     elif game_state == GameStates.SHOW_INVENTORY:
         return handle_inventory_keys(key)
+    elif game_state == GameStates.TARGETING:
+        return handle_targeting_keys
     return {}
 
 def handle_player_turn_keys(key):
@@ -61,4 +63,16 @@ def handle_env_keys(key):
         return {'fullscreen': True}
     elif key.vk == libtcod.KEY_ESCAPE:
         return {'exit': True}
+    return {}
+
+def handle_targeting_keys(key):
+    return handle_env_keys(key)
+
+def handle_mouse(mouse):
+    (x, y) = (mouse.cx, mouse.cy)
+
+    if mouse.lbutton_pressed:
+        return {'left_click': (x,y)}
+    elif mouse.rbutton_pressed:
+        return {'right_click': (x,y)}
     return {}

@@ -4,7 +4,7 @@ from fov_functions import initialize_fov,recompute_fov
 #import entity
 from entity import Entity,get_blocking_entities_at_location
 from game_states import GameStates
-from input_handlers import handle_keys
+from input_handlers import handle_keys, handle_mouse
 from components.fighter import Fighter
 from components.ai import BasicMonster
 from map_objects.game_map import GameMap
@@ -83,6 +83,7 @@ def main():
         clear_all(con, entities)
 
         action = handle_keys(key, game_state)
+        mouse_action = handle_mouse(mouse)
         move = action.get('move')
         exit = action.get('exit')
         pickup = action.get('pickup')
@@ -90,6 +91,10 @@ def main():
         drop_inventory = action.get('drop_inventory')
         inventory_index = action.get('inventory_index')
         fullscreen = action.get('fullscreen')
+
+        left_click = mouse_action.get('left_click')
+        right_click = mouse_action.get('right_click')
+
         player_turn_results = []
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
