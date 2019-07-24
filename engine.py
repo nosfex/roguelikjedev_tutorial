@@ -71,6 +71,8 @@ def main():
     event = ''
     game_state = GameStates.PLAYERS_TURN
     previous_game_state = game_state
+
+    targeting_item = None
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
@@ -134,9 +136,20 @@ def main():
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player.inventory.drop_item(item))
 
+        if game_state = GameStates.TARGETING:
+            if left_click:
+                target_x, target_y = left_click
+                item_use_results = player.inventory.use(targeting_item, entities=entities, fov_map=fov_map,
+                                                        target_x=target_x, target_y=target_y)
+                player_turn_results.extend(item_use_results)
+            elif right_click:
+                player_turn_results.append({'targeting_cancelled':True})
+
         if exit:
             if game_state in( GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
                 game_state = previous_game_state
+            elif game_state == GameStates.TARGETING:
+                player_turn_results.append({'targeting_cancelled':True})
             else:
                 return True
 
@@ -149,6 +162,8 @@ def main():
             item_added = player_turn_result.get('item_added')
             item_consumed = player_turn_result.get('consumed')
             item_dropped = player_turn_result.get('item_dropped')
+            targeting = player_turn_result.get('targeting')
+            targeting_cancelled = player_turn_result.get('targeting_cancelled')
 
             if message:
                 message_log.add_message(message)
@@ -169,6 +184,16 @@ def main():
             if item_dropped:
                 entities.append(item_dropped)
                 game_state = GameStates.ENEMY_TURN
+
+            if targeting:
+                previous_game_state = GameStates.PLAYERS_TURN
+                game_state = GameStates.TARGETING
+                targeting_item = targeting
+                message_log.add_message(targeting_item.targeting_message)
+
+            if targeting_cancelled:
+                game_state = previous_game_state
+                message_log.add_message(Message('Targeting Cancelled'))
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
