@@ -8,7 +8,7 @@ from components.fighter import Fighter
 from map_objects.rectangle import Rect
 from render_functions import RenderOrder
 from game_messages import Message
-from item_functions import heal, cast_lighting, cast_fireball
+from item_functions import heal, cast_lighting, cast_fireball, cast_confuse
 class GameMap:
     def __init__(self, width, height):
         self.width = width
@@ -99,8 +99,11 @@ class GameMap:
                 if item_chance < 70:
                     item_component = Item(use_function=heal, amount=4)
                     item = Entity(x,y, '!', libtcod.violet, 'Healing Potion', render_order = RenderOrder.ITEM, item=item_component)
-                elif item_chance < 85:
+                elif item_chance < 80:
                     item_component = Item(use_function = cast_fireball, targeting=True, targeting_message=Message('Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan), damage=12, radius=3)
+                    item = Entity(x,y, '#', libtcod.red, 'Fireball Scroll', render_order=RenderOrder.ITEM, item=item_component)
+                elif item_chance < 90:
+                    item_component = Item(use_function = cast_confuse, targeting=True, targeting_message=Message('Left-click an enemy to confuse it, or right-click to cancel.', libtcod.light_cyan), damage=12, radius=3)
                     item = Entity(x,y, '#', libtcod.red, 'Fireball Scroll', render_order=RenderOrder.ITEM, item=item_component)
                 else:
                     item_component = Item(use_function=cast_lighting, damage=20,  maximum_range=5)
