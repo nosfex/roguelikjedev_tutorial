@@ -1,85 +1,60 @@
 import tcod as libtcod
 import tcod.event
-from fov_functions import initialize_fov,recompute_fov
-#import entity
-from entity import Entity,get_blocking_entities_at_location
+from fov_functions import initialize_fov, recompute_fov
+from entity import get_blocking_entities_at_location
 from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse
-from components.fighter import Fighter
 from components.ai import BasicMonster
-from map_objects.game_map import GameMap
-from game_messages import MessageLog
 from death_functions import kill_monster, kill_player
-from render_functions import clear_all, render_all, RenderOrder
-from components.inventory import Inventory
-from game_messages import Message, MessageLog
+from render_functions import clear_all, render_all
+from game_messages import Message
+from loader_functions.initialize_new_game import get_constants, get_game_variables
+
 
 def main():
-    screen_width = 80
-    screen_height = 50
+    constants = get_constants()
+    variables = get_game_variables()
+    player_x = int(constants['screen_width'] / 2)
+    player_y = int(constants['screen_height'] / 2)
+    libtcod.console_set_custom_font('arial10x10.png',
+                                    libtcod.FONT_TYPE_GREYSCALE
+                                    | libtcod.FONT_LAYOUT_TCOD)
 
-    bar_width = 20
-    panel_height = 7
-    panel_y = screen_height - panel_height
+    libtcod.console_init_root(constants['screen_width'],
+                              constants['screen_height'],
+                              'libtcod tutorial revised', False,
+                              libtcod.RENDERER_SDL2, 'C', True)
+    con = libtcod.console.Console(constants['screen_width'],
+                                  constants['screen_height'])
+    panel = libtcod.console.Console(constants['screen_width'],
+                                    constants['screen_height'])
 
-    message_x = bar_width + 2
-    message_width = screen_width - bar_width - 2
-    message_height = panel_height - 1
-
-    map_width = 80
-    map_height = 43
-
-    room_max_size = 10
-    room_min_size = 6
-    max_rooms = 30
-
-    fov_algorithm = 0
-    fov_light_walls = True
-    fov_radius = 10
-
-    max_monsters_per_room = 3
-    max_items_per_room = 2
-
-    colors = {
-        'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150),
-        'light_wall' : libtcod.Color(130, 110, 50),
-        'light_ground' : libtcod.Color(200, 180, 50)
-    }
-    player_x = int(screen_width / 2)
-    player_y = int(screen_height / 2)
-    libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-
-    fighter_component = Fighter(hp=30, defense=2, power=5)
-    inventory_component = Inventory(26)
-    player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, inventory=inventory_component)
-    entities = [player]
-    libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False, libtcod.RENDERER_SDL2, 'C', True)
-    con = libtcod.console.Console(screen_width, screen_height)
-
-    panel = libtcod.console.Console(screen_width, panel_height)
-    game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room, max_items_per_room)
+    player, entities, game_map, message_log, game_state = get_game_variables(constants)
 
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
-    message_log = MessageLog(message_x, message_width, message_height)
-
     key = libtcod.Key()
     mouse = libtcod.Mouse()
     event = ''
-    game_state = GameStates.PLAYERS_TURN
     previous_game_state = game_state
 
     targeting_item = None
     while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS
+                                    | libtcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
+            recompute_fov(fov_map, player.x, player.y, constants['fov_radius'],
+                          constants['fov_light_walls'],
+                          constants['fov_algorithm'])
 
-        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state)
+        render_all(con, panel, entities, player, game_map, fov_map,
+                   fov_recompute, message_log, constants['screen_width'],
+                   constants['screen_height'], constants['bar_width'],
+                   constants['panel_height'], constants['panel_y'], mouse,
+                   constants['colors'], game_state)
+
         fov_recompute = False
         libtcod.console_flush()
         clear_all(con, entities)
@@ -103,7 +78,9 @@ def main():
             destination_x = player.x + dx
             destination_y = player.y + dy
             if not game_map.is_blocked(destination_x, destination_y):
-                target = get_blocking_entities_at_location(entities, destination_x, destination_y)
+                target = get_blocking_entities_at_location(entities,
+                                                           destination_x,
+                                                           destination_y)
                 if target:
                     attack_results = player.fighter.attack(target)
                     player_turn_results.extend(attack_results)
@@ -129,7 +106,9 @@ def main():
             previous_game_state = game_states
             game_state = GameStates.DROP_INVENTORY
 
-        if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD  and inventory_index < len(player.inventory.items):
+        if inventory_index is not None and previous_game_state !=
+        GameStates.PLAYER_DEAD
+        and inventory_index < len(player.inventory.items):
             item = player.inventory.items[inventory_index]
             if game_state == GameStates.SHOW_INVENTORY:
                 player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map))
@@ -146,7 +125,7 @@ def main():
                 player_turn_results.append({'targeting_cancelled':True})
 
         if exit:
-            if game_state in( GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
+            if game_state in(GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
                 game_state = previous_game_state
             elif game_state == GameStates.TARGETING:
                 player_turn_results.append({'targeting_cancelled':True})
@@ -218,6 +197,7 @@ def main():
 
             else:
                 game_state = GameStates.PLAYERS_TURN
+
 
 if __name__ == '__main__':
     main()
