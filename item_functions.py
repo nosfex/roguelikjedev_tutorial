@@ -1,5 +1,5 @@
 import tcod as libtcod
-from game_messages import Message, MessageLog
+from game_messages import Message
 from components.ai import ConfusedMonster
 
 def heal(*args, **kwargs):
@@ -40,6 +40,7 @@ def cast_lighting(*args, **kwargs):
             results.extend(target.fighter.take_damage(damage))
         else:
             results.append({'consumed':False, 'target':None, 'message': Message('No enemy in range', libtcod.red)})
+    return results
 
 def cast_fireball(*args, **kwargs):
     entities    = kwargs.get('entities')

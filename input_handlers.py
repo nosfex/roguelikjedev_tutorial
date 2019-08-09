@@ -10,7 +10,7 @@ def handle_keys(key, game_state) :
     elif game_state == GameStates.SHOW_INVENTORY:
         return handle_inventory_keys(key)
     elif game_state == GameStates.TARGETING:
-        return handle_targeting_keys
+        return handle_targeting_keys(key)
     return {}
 
 def handle_player_turn_keys(key):
@@ -75,4 +75,16 @@ def handle_mouse(mouse):
         return {'left_click': (x,y)}
     elif mouse.rbutton_pressed:
         return {'right_click': (x,y)}
+    return {}
+
+def handle_main_menu(key):
+    key_char = chr(key.c)
+
+    if key_char == 'a':
+        return {'new_game': True}
+    elif key_char == 'b':
+        return {'load_game': True}
+    elif key_char == 'c':
+        return {'exit': True}
+
     return {}
