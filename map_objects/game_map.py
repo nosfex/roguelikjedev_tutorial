@@ -9,11 +9,13 @@ from map_objects.rectangle import Rect
 from render_functions import RenderOrder
 from game_messages import Message
 from item_functions import heal, cast_lighting, cast_fireball, cast_confuse
+from components.stairs import Stairs
 class GameMap:
-    def __init__(self, width, height):
+    def __init__(self, width, height, dungeon_level=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
+        self.dungeon_level = dungeon_level
 
     def initialize_tiles(self):
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
@@ -39,6 +41,9 @@ class GameMap:
         rooms = []
         num_rooms = 0
 
+        center_of_last_room_x = None
+        center_of_last_room_y = None
+
         for r in range(max_rooms):
             w=randint(room_min_size, room_max_size)
             h=randint(room_min_size, room_max_size)
@@ -53,7 +58,8 @@ class GameMap:
             else:
                 self.create_room(new_room)
                 (new_x, new_y) = new_room.center()
-                print('valid room')
+                center_of_last_room_x = new_x
+                center_of_last_room_y = new_y
                 if num_rooms == 0:
                     print(r)
                     player.x = new_x
@@ -69,6 +75,9 @@ class GameMap:
                 self.place_entities(new_room, entities, max_monsters_per_room, max_items_per_room)
                 rooms.append(new_room)
                 num_rooms+=1
+            stairs_component = Stairs(self.dungeon_level + 1)
+            down_stairs = Entity(center_of_last_room_x, center_of_last_room_y,  '>', libtcod.white, 'Stairs', render_order=RenderOrder.STAIRS, stairs=stairs_component)
+            entities.append(down_stairs)
 
     def place_entities(self, room, entities, max_monsters_per_room, max_items_per_room):
         number_of_monsters = randint(0, max_monsters_per_room)
@@ -109,6 +118,23 @@ class GameMap:
                     item_component = Item(use_function=cast_lighting, damage=20,  maximum_range=5)
                     item = Entity(x, y, '#', libtcod.yellow, 'Lightning Scroll', render_order= RenderOrder.ITEM, item=item_component)
                 entities.append(item)
+
+
+    def next_floor(self, player, message_log, constants):
+        self.dungeon_level += 1
+        entities = [player]
+
+        self.tiles = self.initialize_tiles()
+        self.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
+                      constants['map_width'], constants['map_height'], player, entities,
+                      constants['max_monsters_per_room'], constants['max_items_per_room'])
+        player.fighter.heal(player.fighter.max_hp // 2)
+
+        message_log.add_message(Message('You take a moment to rest, and recover your strength.', libtcod.light_violet))
+
+        return entities
+
+
     def is_blocked(self, x, y):
         if self.tiles[x][y].blocked:
             return True
