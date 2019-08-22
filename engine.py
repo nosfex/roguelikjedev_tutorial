@@ -137,6 +137,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             item_consumed = player_turn_result.get('consumed')
             item_dropped = player_turn_result.get('item_dropped')
             targeting = player_turn_result.get('targeting')
+            xp = player_turn_result.get('xp')
             targeting_cancelled = player_turn_result.get('targeting_cancelled')
 
             if message:
@@ -175,6 +176,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 game_state = previous_game_state
 
                 message_log.add_message(Message('Targeting cancelled'))
+
+            if xp:
+                leveled_up = 
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:

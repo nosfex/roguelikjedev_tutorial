@@ -6,7 +6,8 @@ class Entity:
     """
     A Generic object to rep stuff
     """
-    def __init__(self, x, y, char, color, name, blocks = False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inventory=None, stairs=None):
+    def __init__(self, x, y, char, color, name, blocks = False, render_order=RenderOrder.CORPSE, fighter=None, ai=None,
+                    item=None, inventory=None, stairs=None, level=None):
         self.x = x
         self.y = y
         self.char = char
@@ -19,7 +20,7 @@ class Entity:
         self.item = item
         self.inventory = inventory
         self.stairs = stairs
-
+        self.level = level
 
         if self.fighter:
             self.fighter.owner = self
@@ -31,6 +32,8 @@ class Entity:
             self.inventory.owner = self
         if self.stairs:
             self.stairs.owner = self
+        if self.level:
+            self.level.owner = self
 
     def move(self, dx, dy):
         self.x += dx
