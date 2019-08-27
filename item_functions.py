@@ -2,6 +2,7 @@ import tcod as libtcod
 from game_messages import Message
 from components.ai import ConfusedMonster
 
+
 def heal(*args, **kwargs):
     entity = args[0]
     amount = kwargs.get('amount')
@@ -16,6 +17,7 @@ def heal(*args, **kwargs):
 
     return results
 
+
 def cast_lighting(*args, **kwargs):
     caster = args[0]
     entities = kwargs.get('entities')
@@ -26,7 +28,7 @@ def cast_lighting(*args, **kwargs):
     results = []
 
     target = None
-    closest_distance = maximum_range +1
+    closest_distance = maximum_range + 1
     for entity in entities:
         if entity.fighter and entity != caster and libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
             distance = caster.distance_to(entity)
@@ -42,13 +44,14 @@ def cast_lighting(*args, **kwargs):
         results.append({'consumed':False, 'target':None, 'message': Message('No enemy in range', libtcod.red)})
     return results
 
+
 def cast_fireball(*args, **kwargs):
-    entities    = kwargs.get('entities')
-    fov_map     = kwargs.get('fov_map')
-    damage      = kwargs.get('damage')
-    radius      = kwargs.get('radius')
-    target_x    = kwargs.get('target_x')
-    target_y    = kwargs.get('target_y')
+    entities = kwargs.get('entities')
+    fov_map = kwargs.get('fov_map')
+    damage = kwargs.get('damage')
+    radius = kwargs.get('radius')
+    target_x = kwargs.get('target_x')
+    target_y = kwargs.get('target_y')
 
     results = []
 
@@ -74,7 +77,7 @@ def cast_confuse(*args, **kwargs):
     results = []
 
     if not libtcod.map_is_in_fov(fov_map, target_x, target_y):
-        results.append({'consumed':False, 'message':Message('You Cannot target a tile outside your field of view.', libtcod.yellow)})
+        results.append({'consumed': False, 'message':Message('You Cannot target a tile outside your field of view.', libtcod.yellow)})
         return results
 
     for entity in entities:

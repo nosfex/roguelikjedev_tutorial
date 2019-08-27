@@ -29,7 +29,8 @@ def menu(con, header, options, width, screen_width, screen_height):
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
 
-def inventory_menu(con, header, inventory, inventory_width, screen_width, screen_height):
+def inventory_menu(con, header, inventory, inventory_width, screen_width,
+                   screen_height):
     if len(inventory.items) == 0:
         options = ['Inventory is empty.']
     else:
@@ -52,6 +53,6 @@ def main_menu(con, background_image, screen_width, screen_height):
     menu(con, '', ['Play a new game', 'Continue last game', 'Quit'], 24,
          screen_width, screen_height)
 
-         
+
 def message_box(con, header, width, screen_width, screen_height):
     menu(con, header, [], width, screen_width, screen_height)
