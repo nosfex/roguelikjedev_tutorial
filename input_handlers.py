@@ -1,6 +1,8 @@
 import tcod as libtcod
 from game_states import GameStates
-def handle_keys(key, game_state) :
+
+
+def handle_keys(key, game_state):
     # Movement keys
 
     if game_state == GameStates.PLAYERS_TURN:
@@ -11,7 +13,12 @@ def handle_keys(key, game_state) :
         return handle_inventory_keys(key)
     elif game_state == GameStates.TARGETING:
         return handle_targeting_keys(key)
+    elif game_state == GameStates.LEVEL_UP:
+        return handle_level_up_menu(key)
+    elif game_state == GameStates.CHARACTER_SCREEN:
+        return handle_character_screen(key)
     return {}
+
 
 def handle_player_turn_keys(key):
     key_char = chr(key.c)
@@ -31,6 +38,11 @@ def handle_player_turn_keys(key):
         return {'move':(-1, 1)}
     elif key_char == '.':
         return {'move':(1,1)}
+    elif key_char == 'c':
+        return {'show_character_screen': True}
+
+    elif key_char == 'z':
+        return {'wait': True}
 
     if key_char == 'g':
         return {'pickup': True}
@@ -42,6 +54,7 @@ def handle_player_turn_keys(key):
         return {'take_stairs' : True}
     return handle_env_keys(key)
 
+
 def handle_inventory_keys(key):
     index = key.c -ord('a')
 
@@ -49,6 +62,7 @@ def handle_inventory_keys(key):
         return {'inventory_index':index}
 
     return handle_env_keys(key)
+
 
 def handle_player_dead_keys(key):
     key_char = chr(key.c)
@@ -58,6 +72,7 @@ def handle_player_dead_keys(key):
 
     return handle_env_keys(key)
 
+
 def handle_env_keys(key):
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         # alt+KEY_ENTER
@@ -66,8 +81,10 @@ def handle_env_keys(key):
         return {'exit': True}
     return {}
 
+
 def handle_targeting_keys(key):
     return handle_env_keys(key)
+
 
 def handle_mouse(mouse):
     (x, y) = (mouse.cx, mouse.cy)
@@ -77,6 +94,7 @@ def handle_mouse(mouse):
     elif mouse.rbutton_pressed:
         return {'right_click': (x,y)}
     return {}
+
 
 def handle_main_menu(key):
     key_char = chr(key.c)
@@ -88,4 +106,22 @@ def handle_main_menu(key):
     elif key_char == 'c':
         return {'exit': True}
 
+    return {}
+
+
+def handle_character_screen(key):
+    if key.vk == libtcod.KEY_ESCAPE:
+        return {'exit': True}
+    return {}
+
+
+def handle_level_up_menu(key):
+    if key:
+        key_char = chr(key.c)
+        if key_char == 'a':
+            return {'level_up': 'hp'}
+        elif key_char == 'b':
+            return {'level_up': 'str'}
+        elif key_char == 'c':
+            return {'level_up': 'def'}
     return {}
