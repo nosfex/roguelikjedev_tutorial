@@ -54,7 +54,7 @@ def main_menu(con, background_image, screen_width, screen_height):
          screen_width, screen_height)
 
 
-def character_screen(player, character_screen_width, character_screen_height, screen_width, screen_height, )
+def character_screen(player, character_screen_width, character_screen_height, screen_width, screen_height):
     window = libtcod.console_new(character_screen_width, character_screen_height)
 
     libtcod.console_set_default_foreground(window, libtcod.white)
