@@ -160,6 +160,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             item_dropped = player_turn_result.get('item_dropped')
             targeting = player_turn_result.get('targeting')
             xp = player_turn_result.get('xp')
+            equip = player_turn_result.get('equip')
             targeting_cancelled = player_turn_result.get('targeting_cancelled')
 
             if message:
@@ -183,6 +184,19 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if item_dropped:
                 entities.append(item_dropped)
+
+                game_state = GameStates.ENEMY_TURN
+
+            if equip:
+                equip_results = player.equipment.toggle_equip(equip)
+                for equip_result in equip_results:
+                    equipped = equip_result.get('equipped')
+                    dequipped = equip_result.get('dequipped')
+
+                    if equipped:
+                        message_log.add_message(Message('You equipped the {0}'.format(equipped.name)))
+                    if dequipped:
+                        message_log.add_message(Message('You dequipped the {0}'.format(dequipped.name)))
 
                 game_state = GameStates.ENEMY_TURN
 
