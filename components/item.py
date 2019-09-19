@@ -4,4 +4,4 @@ class Item:
         self.targeting = targeting
         self.targeting_message = targeting_message
         self.function_kwargs = kwargs
-        self.craftable = None
+        self.craftable = craftable
